@@ -1,1 +1,334 @@
-{"metadata":{"kernelspec":{"language":"python","display_name":"Python 3","name":"python3"},"language_info":{"name":"python","version":"3.10.13","mimetype":"text/x-python","codemirror_mode":{"name":"ipython","version":3},"pygments_lexer":"ipython3","nbconvert_exporter":"python","file_extension":".py"},"kaggle":{"accelerator":"none","dataSources":[],"dockerImageVersionId":30746,"isInternetEnabled":true,"language":"python","sourceType":"notebook","isGpuEnabled":false}},"nbformat_minor":4,"nbformat":4,"cells":[{"cell_type":"code","source":"# This Python 3 environment comes with many helpful analytics libraries installed\n# It is defined by the kaggle/python Docker image: https://github.com/kaggle/docker-python\n# For example, here's several helpful packages to load\n\nimport numpy as np # linear algebra\nimport pandas as pd # data processing, CSV file I/O (e.g. pd.read_csv)\n\n# Input data files are available in the read-only \"../input/\" directory\n# For example, running this (by clicking run or pressing Shift+Enter) will list all files under the input directory\n\nimport os\nfor dirname, _, filenames in os.walk('/kaggle/input'):\n    for filename in filenames:\n        print(os.path.join(dirname, filename))\n\n# You can write up to 20GB to the current directory (/kaggle/working/) that gets preserved as output when you create a version using \"Save & Run All\" \n# You can also write temporary files to /kaggle/temp/, but they won't be saved outside of the current session","metadata":{"_uuid":"8f2839f25d086af736a60e9eeb907d3b93b6e0e5","_cell_guid":"b1076dfc-b9ad-4769-8c92-a6c4dae69d19","execution":{"iopub.status.busy":"2024-08-05T19:46:01.284399Z","iopub.execute_input":"2024-08-05T19:46:01.284800Z","iopub.status.idle":"2024-08-05T19:46:01.292386Z","shell.execute_reply.started":"2024-08-05T19:46:01.284772Z","shell.execute_reply":"2024-08-05T19:46:01.291122Z"},"trusted":true},"execution_count":28,"outputs":[]},{"cell_type":"code","source":"!pip install streamlit\n!npm install localtunnel","metadata":{"execution":{"iopub.status.busy":"2024-08-05T19:46:19.147503Z","iopub.execute_input":"2024-08-05T19:46:19.147920Z","iopub.status.idle":"2024-08-05T19:46:35.085146Z","shell.execute_reply.started":"2024-08-05T19:46:19.147884Z","shell.execute_reply":"2024-08-05T19:46:35.083436Z"},"trusted":true},"execution_count":33,"outputs":[{"name":"stdout","text":"\u001b[33mWARNING: Ignoring invalid distribution -eras (/opt/conda/lib/python3.10/site-packages)\u001b[0m\u001b[33m\n\u001b[0mRequirement already satisfied: streamlit in /opt/conda/lib/python3.10/site-packages (1.37.0)\nRequirement already satisfied: altair<6,>=4.0 in /opt/conda/lib/python3.10/site-packages (from streamlit) (5.3.0)\nRequirement already satisfied: blinker<2,>=1.0.0 in /opt/conda/lib/python3.10/site-packages (from streamlit) (1.8.2)\nRequirement already satisfied: cachetools<6,>=4.0 in /opt/conda/lib/python3.10/site-packages (from streamlit) (4.2.4)\nRequirement already satisfied: click<9,>=7.0 in /opt/conda/lib/python3.10/site-packages (from streamlit) (8.1.7)\nRequirement already satisfied: numpy<3,>=1.20 in /opt/conda/lib/python3.10/site-packages (from streamlit) (1.26.4)\nRequirement already satisfied: packaging<25,>=20 in /opt/conda/lib/python3.10/site-packages (from streamlit) (21.3)\nRequirement already satisfied: pandas<3,>=1.3.0 in /opt/conda/lib/python3.10/site-packages (from streamlit) (2.2.2)\nRequirement already satisfied: pillow<11,>=7.1.0 in /opt/conda/lib/python3.10/site-packages (from streamlit) (9.5.0)\nRequirement already satisfied: protobuf<6,>=3.20 in /opt/conda/lib/python3.10/site-packages (from streamlit) (3.20.3)\nRequirement already satisfied: pyarrow>=7.0 in /opt/conda/lib/python3.10/site-packages (from streamlit) (16.1.0)\nRequirement already satisfied: requests<3,>=2.27 in /opt/conda/lib/python3.10/site-packages (from streamlit) (2.32.3)\nRequirement already satisfied: rich<14,>=10.14.0 in /opt/conda/lib/python3.10/site-packages (from streamlit) (13.7.0)\nRequirement already satisfied: tenacity<9,>=8.1.0 in /opt/conda/lib/python3.10/site-packages (from streamlit) (8.2.3)\nRequirement already satisfied: toml<2,>=0.10.1 in /opt/conda/lib/python3.10/site-packages (from streamlit) (0.10.2)\nRequirement already satisfied: typing-extensions<5,>=4.3.0 in /opt/conda/lib/python3.10/site-packages (from streamlit) (4.9.0)\nRequirement already satisfied: gitpython!=3.1.19,<4,>=3.0.7 in /opt/conda/lib/python3.10/site-packages (from streamlit) (3.1.41)\nRequirement already satisfied: pydeck<1,>=0.8.0b4 in /opt/conda/lib/python3.10/site-packages (from streamlit) (0.9.1)\nRequirement already satisfied: tornado<7,>=6.0.3 in /opt/conda/lib/python3.10/site-packages (from streamlit) (6.3.3)\nRequirement already satisfied: watchdog<5,>=2.1.5 in /opt/conda/lib/python3.10/site-packages (from streamlit) (4.0.1)\nRequirement already satisfied: jinja2 in /opt/conda/lib/python3.10/site-packages (from altair<6,>=4.0->streamlit) (3.1.2)\nRequirement already satisfied: jsonschema>=3.0 in /opt/conda/lib/python3.10/site-packages (from altair<6,>=4.0->streamlit) (4.20.0)\nRequirement already satisfied: toolz in /opt/conda/lib/python3.10/site-packages (from altair<6,>=4.0->streamlit) (0.12.1)\nRequirement already satisfied: gitdb<5,>=4.0.1 in /opt/conda/lib/python3.10/site-packages (from gitpython!=3.1.19,<4,>=3.0.7->streamlit) (4.0.11)\nRequirement already satisfied: pyparsing!=3.0.5,>=2.0.2 in /opt/conda/lib/python3.10/site-packages (from packaging<25,>=20->streamlit) (3.1.1)\nRequirement already satisfied: python-dateutil>=2.8.2 in /opt/conda/lib/python3.10/site-packages (from pandas<3,>=1.3.0->streamlit) (2.9.0.post0)\nRequirement already satisfied: pytz>=2020.1 in /opt/conda/lib/python3.10/site-packages (from pandas<3,>=1.3.0->streamlit) (2023.3.post1)\nRequirement already satisfied: tzdata>=2022.7 in /opt/conda/lib/python3.10/site-packages (from pandas<3,>=1.3.0->streamlit) (2023.4)\nRequirement already satisfied: charset-normalizer<4,>=2 in /opt/conda/lib/python3.10/site-packages (from requests<3,>=2.27->streamlit) (3.3.2)\nRequirement already satisfied: idna<4,>=2.5 in /opt/conda/lib/python3.10/site-packages (from requests<3,>=2.27->streamlit) (3.6)\nRequirement already satisfied: urllib3<3,>=1.21.1 in /opt/conda/lib/python3.10/site-packages (from requests<3,>=2.27->streamlit) (1.26.18)\nRequirement already satisfied: certifi>=2017.4.17 in /opt/conda/lib/python3.10/site-packages (from requests<3,>=2.27->streamlit) (2024.7.4)\nRequirement already satisfied: markdown-it-py>=2.2.0 in /opt/conda/lib/python3.10/site-packages (from rich<14,>=10.14.0->streamlit) (3.0.0)\nRequirement already satisfied: pygments<3.0.0,>=2.13.0 in /opt/conda/lib/python3.10/site-packages (from rich<14,>=10.14.0->streamlit) (2.17.2)\nRequirement already satisfied: smmap<6,>=3.0.1 in /opt/conda/lib/python3.10/site-packages (from gitdb<5,>=4.0.1->gitpython!=3.1.19,<4,>=3.0.7->streamlit) (5.0.1)\nRequirement already satisfied: MarkupSafe>=2.0 in /opt/conda/lib/python3.10/site-packages (from jinja2->altair<6,>=4.0->streamlit) (2.1.3)\nRequirement already satisfied: attrs>=22.2.0 in /opt/conda/lib/python3.10/site-packages (from jsonschema>=3.0->altair<6,>=4.0->streamlit) (23.2.0)\nRequirement already satisfied: jsonschema-specifications>=2023.03.6 in /opt/conda/lib/python3.10/site-packages (from jsonschema>=3.0->altair<6,>=4.0->streamlit) (2023.12.1)\nRequirement already satisfied: referencing>=0.28.4 in /opt/conda/lib/python3.10/site-packages (from jsonschema>=3.0->altair<6,>=4.0->streamlit) (0.32.1)\nRequirement already satisfied: rpds-py>=0.7.1 in /opt/conda/lib/python3.10/site-packages (from jsonschema>=3.0->altair<6,>=4.0->streamlit) (0.16.2)\nRequirement already satisfied: mdurl~=0.1 in /opt/conda/lib/python3.10/site-packages (from markdown-it-py>=2.2.0->rich<14,>=10.14.0->streamlit) (0.1.2)\nRequirement already satisfied: six>=1.5 in /opt/conda/lib/python3.10/site-packages (from python-dateutil>=2.8.2->pandas<3,>=1.3.0->streamlit) (1.16.0)\n\u001b[33mWARNING: Ignoring invalid distribution -eras (/opt/conda/lib/python3.10/site-packages)\u001b[0m\u001b[33m\n\u001b[K\u001b[?25hm#########\u001b[0m\u001b[100;90m.........\u001b[0m] \\ idealTree: \u001b[32;40mtiming\u001b[0m \u001b[35midealTree\u001b[0m Completed in 113ms\u001b[0m\u001b[K\nup to date, audited 23 packages in 712ms\n\n3 packages are looking for funding\n  run `npm fund` for details\n\n2 \u001b[33m\u001b[1mmoderate\u001b[22m\u001b[39m severity vulnerabilities\n\nTo address all issues (including breaking changes), run:\n  npm audit fix --force\n\nRun `npm audit` for details.\n","output_type":"stream"}]},{"cell_type":"code","source":"%%writefile app.py\n\nimport streamlit as st\nimport io\nfrom PIL import Image\nimport numpy as np\nfrom tensorflow.keras.applications import EfficientNetB0\nfrom tensorflow.keras.preprocessing import image\nfrom tensorflow.keras.applications.efficientnet import preprocess_input, decode_predictions\nst.title('Image Classification')\n\n\ndef load_model():\n    return EfficientNetB0(weights='imagenet')\n\n\ndef preprocess_image(img):\n    img = img.resize((224, 224))\n    x = image.img_to_array(img)\n    x = np.expand_dims(x, axis=0)\n    x = preprocess_input(x)\n    return x\n\n\ndef load_image():\n    uploaded_file = st.file_uploader(label='Выберите изображение для распознавания')\n    if uploaded_file is not None:\n        image_data = uploaded_file.getvalue()\n        st.image(image_data)\n        return Image.open(io.BytesIO(image_data))\n    else:\n        return None\n\ndef print_predictions(preds):\n    classes = decode_predictions(preds, top=3)[0]\n    for cl in classes:\n        st.write(cl[1], cl[2])\n\n\nmodel = load_model()\n\n\nst.title('Новая улучшенная классификации изображений в облаке Streamlit')\nimg = load_image()\nresult = st.button('Распознать изображение')\nif result:\n    x = preprocess_image(img)\n    preds = model.predict(x)\n    st.write('**Результаты распознавания:**')\n    print_predictions(preds)","metadata":{"execution":{"iopub.status.busy":"2024-08-05T19:48:42.568931Z","iopub.execute_input":"2024-08-05T19:48:42.569333Z","iopub.status.idle":"2024-08-05T19:48:42.588397Z","shell.execute_reply.started":"2024-08-05T19:48:42.569296Z","shell.execute_reply":"2024-08-05T19:48:42.586677Z"},"trusted":true},"execution_count":40,"outputs":[{"name":"stdout","text":"Overwriting app.py\n","output_type":"stream"}]},{"cell_type":"code","source":"!curl ipv4.icanhazip.com","metadata":{"execution":{"iopub.status.busy":"2024-08-05T19:46:36.223840Z","iopub.execute_input":"2024-08-05T19:46:36.224238Z","iopub.status.idle":"2024-08-05T19:46:37.337802Z","shell.execute_reply.started":"2024-08-05T19:46:36.224203Z","shell.execute_reply":"2024-08-05T19:46:37.336137Z"},"trusted":true},"execution_count":35,"outputs":[{"name":"stdout","text":"35.227.63.91\n","output_type":"stream"}]},{"cell_type":"code","source":"!streamlit run app.py &>./logs.txt & npx localtunnel --port 8501","metadata":{"execution":{"iopub.status.busy":"2024-08-05T20:04:26.183004Z","iopub.execute_input":"2024-08-05T20:04:26.183537Z","iopub.status.idle":"2024-08-05T20:05:50.534886Z","shell.execute_reply.started":"2024-08-05T20:04:26.183499Z","shell.execute_reply":"2024-08-05T20:05:50.533277Z"},"trusted":true},"execution_count":43,"outputs":[{"name":"stdout","text":"^C\n","output_type":"stream"}]}]}
+{
+ "cells": [
+  {
+   "cell_type": "code",
+   "execution_count": 1,
+   "id": "00f5387a",
+   "metadata": {
+    "_cell_guid": "b1076dfc-b9ad-4769-8c92-a6c4dae69d19",
+    "_uuid": "8f2839f25d086af736a60e9eeb907d3b93b6e0e5",
+    "execution": {
+     "iopub.execute_input": "2024-08-05T20:02:02.161782Z",
+     "iopub.status.busy": "2024-08-05T20:02:02.161345Z",
+     "iopub.status.idle": "2024-08-05T20:02:03.118323Z",
+     "shell.execute_reply": "2024-08-05T20:02:03.117188Z"
+    },
+    "papermill": {
+     "duration": 0.965368,
+     "end_time": "2024-08-05T20:02:03.121491",
+     "exception": false,
+     "start_time": "2024-08-05T20:02:02.156123",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "outputs": [],
+   "source": [
+    "# This Python 3 environment comes with many helpful analytics libraries installed\n",
+    "# It is defined by the kaggle/python Docker image: https://github.com/kaggle/docker-python\n",
+    "# For example, here's several helpful packages to load\n",
+    "\n",
+    "import numpy as np # linear algebra\n",
+    "import pandas as pd # data processing, CSV file I/O (e.g. pd.read_csv)\n",
+    "\n",
+    "# Input data files are available in the read-only \"../input/\" directory\n",
+    "# For example, running this (by clicking run or pressing Shift+Enter) will list all files under the input directory\n",
+    "\n",
+    "import os\n",
+    "for dirname, _, filenames in os.walk('/kaggle/input'):\n",
+    "    for filename in filenames:\n",
+    "        print(os.path.join(dirname, filename))\n",
+    "\n",
+    "# You can write up to 20GB to the current directory (/kaggle/working/) that gets preserved as output when you create a version using \"Save & Run All\" \n",
+    "# You can also write temporary files to /kaggle/temp/, but they won't be saved outside of the current session"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 2,
+   "id": "98be212e",
+   "metadata": {
+    "execution": {
+     "iopub.execute_input": "2024-08-05T20:02:03.129944Z",
+     "iopub.status.busy": "2024-08-05T20:02:03.129395Z",
+     "iopub.status.idle": "2024-08-05T20:02:25.725779Z",
+     "shell.execute_reply": "2024-08-05T20:02:25.724378Z"
+    },
+    "papermill": {
+     "duration": 22.603729,
+     "end_time": "2024-08-05T20:02:25.728625",
+     "exception": false,
+     "start_time": "2024-08-05T20:02:03.124896",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Collecting streamlit\r\n",
+      "  Downloading streamlit-1.37.1-py2.py3-none-any.whl.metadata (8.5 kB)\r\n",
+      "Requirement already satisfied: altair<6,>=4.0 in /opt/conda/lib/python3.10/site-packages (from streamlit) (5.3.0)\r\n",
+      "Requirement already satisfied: blinker<2,>=1.0.0 in /opt/conda/lib/python3.10/site-packages (from streamlit) (1.8.2)\r\n",
+      "Requirement already satisfied: cachetools<6,>=4.0 in /opt/conda/lib/python3.10/site-packages (from streamlit) (4.2.4)\r\n",
+      "Requirement already satisfied: click<9,>=7.0 in /opt/conda/lib/python3.10/site-packages (from streamlit) (8.1.7)\r\n",
+      "Requirement already satisfied: numpy<3,>=1.20 in /opt/conda/lib/python3.10/site-packages (from streamlit) (1.26.4)\r\n",
+      "Requirement already satisfied: packaging<25,>=20 in /opt/conda/lib/python3.10/site-packages (from streamlit) (21.3)\r\n",
+      "Requirement already satisfied: pandas<3,>=1.3.0 in /opt/conda/lib/python3.10/site-packages (from streamlit) (2.2.2)\r\n",
+      "Requirement already satisfied: pillow<11,>=7.1.0 in /opt/conda/lib/python3.10/site-packages (from streamlit) (9.5.0)\r\n",
+      "Requirement already satisfied: protobuf<6,>=3.20 in /opt/conda/lib/python3.10/site-packages (from streamlit) (3.20.3)\r\n",
+      "Requirement already satisfied: pyarrow>=7.0 in /opt/conda/lib/python3.10/site-packages (from streamlit) (16.1.0)\r\n",
+      "Requirement already satisfied: requests<3,>=2.27 in /opt/conda/lib/python3.10/site-packages (from streamlit) (2.32.3)\r\n",
+      "Requirement already satisfied: rich<14,>=10.14.0 in /opt/conda/lib/python3.10/site-packages (from streamlit) (13.7.0)\r\n",
+      "Requirement already satisfied: tenacity<9,>=8.1.0 in /opt/conda/lib/python3.10/site-packages (from streamlit) (8.2.3)\r\n",
+      "Requirement already satisfied: toml<2,>=0.10.1 in /opt/conda/lib/python3.10/site-packages (from streamlit) (0.10.2)\r\n",
+      "Requirement already satisfied: typing-extensions<5,>=4.3.0 in /opt/conda/lib/python3.10/site-packages (from streamlit) (4.9.0)\r\n",
+      "Requirement already satisfied: gitpython!=3.1.19,<4,>=3.0.7 in /opt/conda/lib/python3.10/site-packages (from streamlit) (3.1.41)\r\n",
+      "Collecting pydeck<1,>=0.8.0b4 (from streamlit)\r\n",
+      "  Downloading pydeck-0.9.1-py2.py3-none-any.whl.metadata (4.1 kB)\r\n",
+      "Requirement already satisfied: tornado<7,>=6.0.3 in /opt/conda/lib/python3.10/site-packages (from streamlit) (6.3.3)\r\n",
+      "Collecting watchdog<5,>=2.1.5 (from streamlit)\r\n",
+      "  Downloading watchdog-4.0.1-py3-none-manylinux2014_x86_64.whl.metadata (37 kB)\r\n",
+      "Requirement already satisfied: jinja2 in /opt/conda/lib/python3.10/site-packages (from altair<6,>=4.0->streamlit) (3.1.2)\r\n",
+      "Requirement already satisfied: jsonschema>=3.0 in /opt/conda/lib/python3.10/site-packages (from altair<6,>=4.0->streamlit) (4.20.0)\r\n",
+      "Requirement already satisfied: toolz in /opt/conda/lib/python3.10/site-packages (from altair<6,>=4.0->streamlit) (0.12.1)\r\n",
+      "Requirement already satisfied: gitdb<5,>=4.0.1 in /opt/conda/lib/python3.10/site-packages (from gitpython!=3.1.19,<4,>=3.0.7->streamlit) (4.0.11)\r\n",
+      "Requirement already satisfied: pyparsing!=3.0.5,>=2.0.2 in /opt/conda/lib/python3.10/site-packages (from packaging<25,>=20->streamlit) (3.1.1)\r\n",
+      "Requirement already satisfied: python-dateutil>=2.8.2 in /opt/conda/lib/python3.10/site-packages (from pandas<3,>=1.3.0->streamlit) (2.9.0.post0)\r\n",
+      "Requirement already satisfied: pytz>=2020.1 in /opt/conda/lib/python3.10/site-packages (from pandas<3,>=1.3.0->streamlit) (2023.3.post1)\r\n",
+      "Requirement already satisfied: tzdata>=2022.7 in /opt/conda/lib/python3.10/site-packages (from pandas<3,>=1.3.0->streamlit) (2023.4)\r\n",
+      "Requirement already satisfied: charset-normalizer<4,>=2 in /opt/conda/lib/python3.10/site-packages (from requests<3,>=2.27->streamlit) (3.3.2)\r\n",
+      "Requirement already satisfied: idna<4,>=2.5 in /opt/conda/lib/python3.10/site-packages (from requests<3,>=2.27->streamlit) (3.6)\r\n",
+      "Requirement already satisfied: urllib3<3,>=1.21.1 in /opt/conda/lib/python3.10/site-packages (from requests<3,>=2.27->streamlit) (1.26.18)\r\n",
+      "Requirement already satisfied: certifi>=2017.4.17 in /opt/conda/lib/python3.10/site-packages (from requests<3,>=2.27->streamlit) (2024.7.4)\r\n",
+      "Requirement already satisfied: markdown-it-py>=2.2.0 in /opt/conda/lib/python3.10/site-packages (from rich<14,>=10.14.0->streamlit) (3.0.0)\r\n",
+      "Requirement already satisfied: pygments<3.0.0,>=2.13.0 in /opt/conda/lib/python3.10/site-packages (from rich<14,>=10.14.0->streamlit) (2.17.2)\r\n",
+      "Requirement already satisfied: smmap<6,>=3.0.1 in /opt/conda/lib/python3.10/site-packages (from gitdb<5,>=4.0.1->gitpython!=3.1.19,<4,>=3.0.7->streamlit) (5.0.1)\r\n",
+      "Requirement already satisfied: MarkupSafe>=2.0 in /opt/conda/lib/python3.10/site-packages (from jinja2->altair<6,>=4.0->streamlit) (2.1.3)\r\n",
+      "Requirement already satisfied: attrs>=22.2.0 in /opt/conda/lib/python3.10/site-packages (from jsonschema>=3.0->altair<6,>=4.0->streamlit) (23.2.0)\r\n",
+      "Requirement already satisfied: jsonschema-specifications>=2023.03.6 in /opt/conda/lib/python3.10/site-packages (from jsonschema>=3.0->altair<6,>=4.0->streamlit) (2023.12.1)\r\n",
+      "Requirement already satisfied: referencing>=0.28.4 in /opt/conda/lib/python3.10/site-packages (from jsonschema>=3.0->altair<6,>=4.0->streamlit) (0.32.1)\r\n",
+      "Requirement already satisfied: rpds-py>=0.7.1 in /opt/conda/lib/python3.10/site-packages (from jsonschema>=3.0->altair<6,>=4.0->streamlit) (0.16.2)\r\n",
+      "Requirement already satisfied: mdurl~=0.1 in /opt/conda/lib/python3.10/site-packages (from markdown-it-py>=2.2.0->rich<14,>=10.14.0->streamlit) (0.1.2)\r\n",
+      "Requirement already satisfied: six>=1.5 in /opt/conda/lib/python3.10/site-packages (from python-dateutil>=2.8.2->pandas<3,>=1.3.0->streamlit) (1.16.0)\r\n",
+      "Downloading streamlit-1.37.1-py2.py3-none-any.whl (8.7 MB)\r\n",
+      "\u001b[2K   \u001b[90m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\u001b[0m \u001b[32m8.7/8.7 MB\u001b[0m \u001b[31m50.5 MB/s\u001b[0m eta \u001b[36m0:00:00\u001b[0m\r\n",
+      "\u001b[?25hDownloading pydeck-0.9.1-py2.py3-none-any.whl (6.9 MB)\r\n",
+      "\u001b[2K   \u001b[90m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\u001b[0m \u001b[32m6.9/6.9 MB\u001b[0m \u001b[31m57.5 MB/s\u001b[0m eta \u001b[36m0:00:00\u001b[0m\r\n",
+      "\u001b[?25hDownloading watchdog-4.0.1-py3-none-manylinux2014_x86_64.whl (83 kB)\r\n",
+      "\u001b[2K   \u001b[90m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\u001b[0m \u001b[32m83.0/83.0 kB\u001b[0m \u001b[31m4.5 MB/s\u001b[0m eta \u001b[36m0:00:00\u001b[0m\r\n",
+      "\u001b[?25hInstalling collected packages: watchdog, pydeck, streamlit\r\n",
+      "Successfully installed pydeck-0.9.1 streamlit-1.37.1 watchdog-4.0.1\r\n",
+      "\u001b[K\u001b[?25h\r\n",
+      "added 22 packages in 2s\r\n",
+      "\r\n",
+      "3 packages are looking for funding\r\n",
+      "  run `npm fund` for details\r\n",
+      "\u001b[37;40mnpm\u001b[0m \u001b[0m\u001b[36;40mnotice\u001b[0m\u001b[35m\u001b[0m \r\n",
+      "\u001b[0m\u001b[37;40mnpm\u001b[0m \u001b[0m\u001b[36;40mnotice\u001b[0m\u001b[35m\u001b[0m New \u001b[33mminor\u001b[39m version of npm available! \u001b[31m10.1.0\u001b[39m -> \u001b[32m10.8.2\u001b[39m\r\n",
+      "\u001b[0m\u001b[37;40mnpm\u001b[0m \u001b[0m\u001b[36;40mnotice\u001b[0m\u001b[35m\u001b[0m Changelog: \u001b[36mhttps://github.com/npm/cli/releases/tag/v10.8.2\u001b[39m\r\n",
+      "\u001b[0m\u001b[37;40mnpm\u001b[0m \u001b[0m\u001b[36;40mnotice\u001b[0m\u001b[35m\u001b[0m Run \u001b[32mnpm install -g npm@10.8.2\u001b[39m to update!\r\n",
+      "\u001b[0m\u001b[37;40mnpm\u001b[0m \u001b[0m\u001b[36;40mnotice\u001b[0m\u001b[35m\u001b[0m \r\n",
+      "\u001b[0m"
+     ]
+    }
+   ],
+   "source": [
+    "!pip install streamlit\n",
+    "!npm install localtunnel"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 3,
+   "id": "bdff9457",
+   "metadata": {
+    "execution": {
+     "iopub.execute_input": "2024-08-05T20:02:25.745975Z",
+     "iopub.status.busy": "2024-08-05T20:02:25.745538Z",
+     "iopub.status.idle": "2024-08-05T20:02:25.755257Z",
+     "shell.execute_reply": "2024-08-05T20:02:25.754059Z"
+    },
+    "papermill": {
+     "duration": 0.021626,
+     "end_time": "2024-08-05T20:02:25.757771",
+     "exception": false,
+     "start_time": "2024-08-05T20:02:25.736145",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Writing app.py\n"
+     ]
+    }
+   ],
+   "source": [
+    "%%writefile app.py\n",
+    "\n",
+    "import streamlit as st\n",
+    "import io\n",
+    "from PIL import Image\n",
+    "import numpy as np\n",
+    "from tensorflow.keras.applications import EfficientNetB0\n",
+    "from tensorflow.keras.preprocessing import image\n",
+    "from tensorflow.keras.applications.efficientnet import preprocess_input, decode_predictions\n",
+    "st.title('Image Classification')\n",
+    "\n",
+    "\n",
+    "def load_model():\n",
+    "    return EfficientNetB0(weights='imagenet')\n",
+    "\n",
+    "\n",
+    "def preprocess_image(img):\n",
+    "    img = img.resize((224, 224))\n",
+    "    x = image.img_to_array(img)\n",
+    "    x = np.expand_dims(x, axis=0)\n",
+    "    x = preprocess_input(x)\n",
+    "    return x\n",
+    "\n",
+    "\n",
+    "def load_image():\n",
+    "    uploaded_file = st.file_uploader(label='Выберите изображение для распознавания')\n",
+    "    if uploaded_file is not None:\n",
+    "        image_data = uploaded_file.getvalue()\n",
+    "        st.image(image_data)\n",
+    "        return Image.open(io.BytesIO(image_data))\n",
+    "    else:\n",
+    "        return None\n",
+    "\n",
+    "def print_predictions(preds):\n",
+    "    classes = decode_predictions(preds, top=3)[0]\n",
+    "    for cl in classes:\n",
+    "        st.write(cl[1], cl[2])\n",
+    "\n",
+    "\n",
+    "model = load_model()\n",
+    "\n",
+    "\n",
+    "st.title('Новая улучшенная классификации изображений в облаке Streamlit')\n",
+    "img = load_image()\n",
+    "result = st.button('Распознать изображение')\n",
+    "if result:\n",
+    "    x = preprocess_image(img)\n",
+    "    preds = model.predict(x)\n",
+    "    st.write('**Результаты распознавания:**')\n",
+    "    print_predictions(preds)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 4,
+   "id": "124a771d",
+   "metadata": {
+    "execution": {
+     "iopub.execute_input": "2024-08-05T20:02:25.775437Z",
+     "iopub.status.busy": "2024-08-05T20:02:25.774484Z",
+     "iopub.status.idle": "2024-08-05T20:02:26.955241Z",
+     "shell.execute_reply": "2024-08-05T20:02:26.953942Z"
+    },
+    "papermill": {
+     "duration": 1.192658,
+     "end_time": "2024-08-05T20:02:26.958160",
+     "exception": false,
+     "start_time": "2024-08-05T20:02:25.765502",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "35.194.178.24\r\n"
+     ]
+    }
+   ],
+   "source": [
+    "!curl ipv4.icanhazip.com"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 5,
+   "id": "0660e0c7",
+   "metadata": {
+    "execution": {
+     "iopub.execute_input": "2024-08-05T20:02:26.976097Z",
+     "iopub.status.busy": "2024-08-05T20:02:26.975004Z",
+     "iopub.status.idle": "2024-08-06T03:36:43.534207Z",
+     "shell.execute_reply": "2024-08-06T03:36:43.532427Z"
+    },
+    "papermill": {
+     "duration": 27256.571523,
+     "end_time": "2024-08-06T03:36:43.537401",
+     "exception": false,
+     "start_time": "2024-08-05T20:02:26.965878",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "your url is: https://gentle-dingos-yawn.loca.lt\r\n"
+     ]
+    }
+   ],
+   "source": [
+    "!streamlit run app.py &>./logs.txt & npx localtunnel --port 8501"
+   ]
+  }
+ ],
+ "metadata": {
+  "kaggle": {
+   "accelerator": "none",
+   "dataSources": [],
+   "dockerImageVersionId": 30746,
+   "isGpuEnabled": false,
+   "isInternetEnabled": true,
+   "language": "python",
+   "sourceType": "notebook"
+  },
+  "kernelspec": {
+   "display_name": "Python 3",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.10.13"
+  },
+  "papermill": {
+   "default_parameters": {},
+   "duration": 27285.122448,
+   "end_time": "2024-08-06T03:36:44.132149",
+   "environment_variables": {},
+   "exception": null,
+   "input_path": "__notebook__.ipynb",
+   "output_path": "__notebook__.ipynb",
+   "parameters": {},
+   "start_time": "2024-08-05T20:01:59.009701",
+   "version": "2.5.0"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 5
+}
